@@ -307,13 +307,29 @@
                         </form>
                     </div>
 
+                    <!-- ════════════════════════════════════
+                         BUDGET MODE TOGGLE (Switch)
+                         Toggle between Projected and Actual entry modes
+                         ════════════════════════════════════ -->
+                    <div class="budget-mode-switch-container">
+                        <div class="budget-mode-switch">
+                            <input type="checkbox" id="budget-mode-switch" class="mode-switch-input" />
+                            <label for="budget-mode-switch" class="mode-switch-label">
+                                <span class="mode-projected">Projected</span>
+                                <span class="mode-toggle"></span>
+                                <span class="mode-actual">Actual</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- ── 3. Fixed Costs ───────────────────────── -->
                     <!--
-            Each line item now has four columns:
-              · Projected Cost     — the estimated cost
-              · Projected Budget   — the allocated budget amount
-              · Actual Cost        — what was actually spent
-              · Actual Budget      — the actual budget used
+            Each line item has five columns (hidden based on mode):
+              · Line item name
+              · Projected Cost     — shown in Projected mode
+              · Projected Budget   — shown in Projected mode
+              · Actual Cost        — shown in Actual mode
+              · Actual Budget      — shown in Actual mode
             The column headers are rendered above the first row via a sticky header row.
                 -->
                     <div class="jf-section">

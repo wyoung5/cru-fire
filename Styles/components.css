@@ -28,7 +28,10 @@
   z-index: 9999;
   transition: top var(--transition);
 }
-.skip-link:focus { top: 0; }
+
+.skip-link:focus {
+  top: 0;
+}
 
 /* -------------------------------------------------- *
    NAVBAR
@@ -54,11 +57,13 @@
   border-radius: var(--radius-sm);
   transition: color var(--transition), background var(--transition);
 }
+
 .navbar-jf .nav-link:hover,
 .navbar-jf .nav-link:focus {
   color: var(--text);
   background: var(--blush);
 }
+
 .navbar-jf .nav-link.active {
   color: var(--coral);
   background: transparent;
@@ -71,7 +76,7 @@
 #auth-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(13,13,13,.72);
+  background: rgba(13, 13, 13, .72);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -80,7 +85,9 @@
   animation: fadeIn 220ms ease;
 }
 
-#auth-overlay.hidden { display: none; }
+#auth-overlay.hidden {
+  display: none;
+}
 
 .auth-card {
   background: var(--surface-alt);
@@ -102,13 +109,19 @@
   cursor: pointer;
   transition: color var(--transition), border-color var(--transition);
 }
+
 .auth-card .tab-btn.active {
   color: var(--coral);
   border-bottom-color: var(--coral);
 }
 
-.auth-panel { display: none; }
-.auth-panel.active { display: block; }
+.auth-panel {
+  display: none;
+}
+
+.auth-panel.active {
+  display: block;
+}
 
 #auth-message {
   font-size: 0.8rem;
@@ -182,7 +195,8 @@
   margin-bottom: var(--sp-1);
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 0.55rem 0.75rem;
@@ -192,13 +206,17 @@
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(54,176,235,.15);
+  box-shadow: 0 0 0 3px rgba(54, 176, 235, .15);
   outline: none;
 }
 
-.form-control::placeholder { color: var(--text-muted); opacity: .7; }
+.form-control::placeholder {
+  color: var(--text-muted);
+  opacity: .7;
+}
 
 /* -------------------------------------------------- *
    BUTTONS
@@ -217,8 +235,16 @@
   transition: background var(--transition), transform var(--transition);
   text-decoration: none;
 }
-.btn-jf-primary:hover  { background: #d96535; transform: translateY(-1px); color: #fff; }
-.btn-jf-primary:active { transform: none; }
+
+.btn-jf-primary:hover {
+  background: #d96535;
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.btn-jf-primary:active {
+  transform: none;
+}
 
 .btn-jf-secondary {
   background: transparent;
@@ -230,6 +256,7 @@
   font-weight: 500;
   transition: border-color var(--transition), color var(--transition);
 }
+
 .btn-jf-secondary:hover {
   border-color: var(--sky);
   color: var(--sky);
@@ -250,7 +277,11 @@
   animation: fadeIn 200ms ease;
   display: none;
 }
-.jf-status.visible { display: block; }
+
+.jf-status.visible {
+  display: block;
+}
+
 .jf-status.error {
   background: #fdecea;
   border-color: #f5c2bb;
@@ -269,8 +300,14 @@
   margin-top: var(--sp-1);
   transition: color var(--transition);
 }
-.autosave-indicator.saved  { color: #2a5c2e; }
-.autosave-indicator.saving { color: var(--sky); }
+
+.autosave-indicator.saved {
+  color: #2a5c2e;
+}
+
+.autosave-indicator.saving {
+  color: var(--sky);
+}
 
 /* -------------------------------------------------- *
    COST TOTALS / SUMMARY CARD
@@ -291,8 +328,15 @@
   font-size: 0.875rem;
 }
 
-.jf-summary dt { color: var(--text-muted); }
-.jf-summary dd { text-align: right; font-weight: 500; font-family: 'DM Mono', monospace; }
+.jf-summary dt {
+  color: var(--text-muted);
+}
+
+.jf-summary dd {
+  text-align: right;
+  font-weight: 500;
+  font-family: 'DM Mono', monospace;
+}
 
 /* ── Grand total row — original single-column variant ── */
 .jf-grand-total {
@@ -305,7 +349,11 @@
   font-size: 1.1rem;
   font-weight: 600;
 }
-.jf-grand-total span { font-family: 'DM Mono', monospace; color: var(--coral); }
+
+.jf-grand-total span {
+  font-family: 'DM Mono', monospace;
+  color: var(--coral);
+}
 
 /* ── Grand total row — three-column variant (cost / budget / actuals) ── */
 .jf-grand-total-grid {
@@ -319,26 +367,118 @@
   font-size: 0.95rem;
   font-weight: 600;
 }
-.jf-grand-total-grid > span {
+
+.jf-grand-total-grid>span {
   font-family: 'DM Mono', monospace;
   color: var(--coral);
   text-align: right;
 }
-.jf-grand-total-grid > span:first-child {
+
+.jf-grand-total-grid>span:first-child {
   font-family: inherit;
   color: var(--text);
   text-align: left;
 }
 
-/* -------------------------------------------------- *
-   COST GRID — three-column line items (features 4 & 5)
-   Layout: [label | cost input | budget input | actuals input]
+/* ================================================-- *
+   BUDGET MODE SWITCH (between Finance & Fixed Costs)
+ * -------------------------------------------------- */
+
+.budget-mode-switch-container {
+  display: flex;
+  justify-content: center;
+  margin: var(--sp-6) 0;
+  padding: 0 var(--sp-4);
+}
+
+.budget-mode-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.mode-switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.mode-switch-label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.mode-switch-label .mode-projected,
+.mode-switch-label .mode-actual {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color var(--transition);
+}
+
+.mode-switch-input:checked~.mode-switch-label .mode-projected {
+  color: var(--text-muted);
+}
+
+.mode-switch-input:not(:checked)~.mode-switch-label .mode-projected {
+  color: var(--coral);
+  font-weight: 600;
+}
+
+.mode-switch-input:checked~.mode-switch-label .mode-actual {
+  color: var(--coral);
+  font-weight: 600;
+}
+
+.mode-switch-input:not(:checked)~.mode-switch-label .mode-actual {
+  color: var(--text-muted);
+}
+
+.mode-toggle {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  background: var(--border);
+  border-radius: 999px;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+
+.mode-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 50%;
+  transition: left var(--transition);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+}
+
+.mode-switch-input:checked~.mode-switch-label .mode-toggle {
+  background: var(--coral);
+}
+
+.mode-switch-input:checked~.mode-switch-label .mode-toggle::after {
+  left: calc(100% - 26px);
+}
+
+/* ================================================-- *
+   COST GRID — dynamic columns based on budget mode
  * -------------------------------------------------- */
 
 /* Column header row */
 .cost-grid-header {
   display: grid;
-  grid-template-columns: 1fr repeat(3, minmax(80px, 120px));
+  grid-template-columns: 1fr repeat(4, minmax(80px, 120px));
   gap: var(--sp-2) var(--sp-4);
   padding: var(--sp-2) 0;
   border-bottom: 1px solid var(--border);
@@ -363,11 +503,15 @@
 }
 
 /* Data rows */
-.cost-grid-rows { display: flex; flex-direction: column; gap: var(--sp-3); }
+.cost-grid-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
 
 .cost-grid-row {
   display: grid;
-  grid-template-columns: 1fr repeat(3, minmax(80px, 120px));
+  grid-template-columns: 1fr repeat(4, minmax(80px, 120px));
   gap: var(--sp-2) var(--sp-4);
   align-items: center;
 }
@@ -389,27 +533,79 @@
   text-align: right;
 }
 
+/* ── Projected mode (default): show columns 1-3, hide 4-5 ── */
+#budget-entry.mode-projected .cost-grid-header> :nth-child(4),
+#budget-entry.mode-projected .cost-grid-header> :nth-child(5),
+#budget-entry.mode-projected .cost-grid-row> :nth-child(4),
+#budget-entry.mode-projected .cost-grid-row> :nth-child(5) {
+  display: none;
+}
+
+#budget-entry.mode-projected .cost-grid-header,
+#budget-entry.mode-projected .cost-grid-row {
+  grid-template-columns: 1fr repeat(2, minmax(80px, 120px));
+}
+
+/* Hide actual totals in projected mode */
+#budget-entry.mode-projected #fixed-cost-total,
+#budget-entry.mode-projected #fixed-budget-total,
+#budget-entry.mode-projected #variable-cost-total,
+#budget-entry.mode-projected #variable-budget-total {
+  display: none;
+}
+
+#budget-entry.mode-projected .jf-grand-total-grid {
+  grid-template-columns: 1fr repeat(2, minmax(80px, 120px));
+}
+
+/* ── Actual mode: show columns 1, 4-5, hide 2-3 ── */
+#budget-entry.mode-actual .cost-grid-header> :nth-child(2),
+#budget-entry.mode-actual .cost-grid-header> :nth-child(3),
+#budget-entry.mode-actual .cost-grid-row> :nth-child(2),
+#budget-entry.mode-actual .cost-grid-row> :nth-child(3) {
+  display: none;
+}
+
+#budget-entry.mode-actual .cost-grid-header,
+#budget-entry.mode-actual .cost-grid-row {
+  grid-template-columns: 1fr repeat(2, minmax(80px, 120px));
+}
+
+/* Hide projected totals in actual mode */
+#budget-entry.mode-actual #fixed-projected-cost-total,
+#budget-entry.mode-actual #fixed-projected-budget-total,
+#budget-entry.mode-actual #variable-projected-cost-total,
+#budget-entry.mode-actual #variable-projected-budget-total {
+  display: none;
+}
+
+#budget-entry.mode-actual .jf-grand-total-grid {
+  grid-template-columns: 1fr repeat(2, minmax(80px, 120px));
+}
+
 /* Colour-code columns for quick visual scanning */
 .cost-grid-row .fixed-budget-input,
 .cost-grid-row .variable-budget-input {
-  border-color: rgba(54,176,235,.4);
-  background: rgba(54,176,235,.04);
+  border-color: rgba(54, 176, 235, .4);
+  background: rgba(54, 176, 235, .04);
 }
+
 .cost-grid-row .fixed-budget-input:focus,
 .cost-grid-row .variable-budget-input:focus {
   border-color: var(--sky);
-  box-shadow: 0 0 0 3px rgba(54,176,235,.15);
+  box-shadow: 0 0 0 3px rgba(54, 176, 235, .15);
 }
 
 .cost-grid-row .fixed-actual-input,
 .cost-grid-row .variable-actual-input {
-  border-color: rgba(240,125,74,.4);
-  background: rgba(240,125,74,.04);
+  border-color: rgba(240, 125, 74, .4);
+  background: rgba(240, 125, 74, .04);
 }
+
 .cost-grid-row .fixed-actual-input:focus,
 .cost-grid-row .variable-actual-input:focus {
   border-color: var(--coral);
-  box-shadow: 0 0 0 3px rgba(240,125,74,.15);
+  box-shadow: 0 0 0 3px rgba(240, 125, 74, .15);
 }
 
 /* -------------------------------------------------- *
@@ -432,7 +628,9 @@
   margin-bottom: var(--sp-4);
 }
 
-#budgetChart { width: 100% !important; }
+#budgetChart {
+  width: 100% !important;
+}
 
 /* -------------------------------------------------- *
    BUDGET VS ACTUALS CHART (feature 5)
@@ -454,7 +652,9 @@
   margin-bottom: var(--sp-4);
 }
 
-#actualsChart { width: 100% !important; }
+#actualsChart {
+  width: 100% !important;
+}
 
 /* -------------------------------------------------- *
    PROJECT SAVED BADGE
@@ -474,7 +674,10 @@
   margin-bottom: var(--sp-4);
   display: none;
 }
-#project-badge.visible { display: inline-flex; }
+
+#project-badge.visible {
+  display: inline-flex;
+}
 
 /* -------------------------------------------------- *
    FINANCE FORMS — locked state
@@ -488,7 +691,7 @@
   content: 'Save a project above to unlock budget forms';
   position: absolute;
   inset: 0;
-  background: rgba(249,249,249,.88);
+  background: rgba(249, 249, 249, .88);
   backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
@@ -502,9 +705,20 @@
   z-index: 10;
 }
 
-.budget-forms-wrapper.locked > * { pointer-events: none; user-select: none; opacity: .4; }
-.budget-forms-wrapper.unlocked::after { display: none; }
-.budget-forms-wrapper.unlocked > * { opacity: 1; pointer-events: auto; }
+.budget-forms-wrapper.locked>* {
+  pointer-events: none;
+  user-select: none;
+  opacity: .4;
+}
+
+.budget-forms-wrapper.unlocked::after {
+  display: none;
+}
+
+.budget-forms-wrapper.unlocked>* {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 /* -------------------------------------------------- *
    AUTH-GATED APP SECTION (feature 1)
@@ -512,8 +726,13 @@
    once the user is authenticated.
  * -------------------------------------------------- */
 
-.app-section { transition: opacity 280ms ease; }
-.app-section.hidden { display: none !important; }
+.app-section {
+  transition: opacity 280ms ease;
+}
+
+.app-section.hidden {
+  display: none !important;
+}
 
 /* -------------------------------------------------- *
    FOOTER
@@ -550,13 +769,18 @@ footer p {
    UTILITIES
  * -------------------------------------------------- */
 
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
+
 .visually-hidden {
   position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
-  clip: rect(0,0,0,0);
+  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
 }
@@ -566,8 +790,15 @@ footer p {
  * -------------------------------------------------- */
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* -------------------------------------------------- *
@@ -575,9 +806,25 @@ footer p {
  * -------------------------------------------------- */
 
 @media print {
-  header, nav, footer, #auth-overlay, .btn-jf-primary, .btn-jf-secondary { display: none; }
-  body { background: #fff; color: #000; }
-  .jf-section { border: 1px solid #ccc; box-shadow: none; }
+
+  header,
+  nav,
+  footer,
+  #auth-overlay,
+  .btn-jf-primary,
+  .btn-jf-secondary {
+    display: none;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .jf-section {
+    border: 1px solid #ccc;
+    box-shadow: none;
+  }
 }
 
 /* -------------------------------------------------- *
@@ -585,21 +832,45 @@ footer p {
  * -------------------------------------------------- */
 
 @media (max-width: 768px) {
-  .jf-section { padding: var(--sp-6) var(--sp-4); }
-  #main-landing .hero-images img { width: 140px; height: 110px; }
+  .jf-section {
+    padding: var(--sp-6) var(--sp-4);
+  }
+
+  #main-landing .hero-images img {
+    width: 140px;
+    height: 110px;
+  }
 
   /* Stack cost grid on mobile */
   .cost-grid-header,
   .cost-grid-row {
     grid-template-columns: 1fr;
   }
-  .cost-grid-header .cost-grid-col-label { display: none; } /* hide col headers; aria-labels carry context */
-  .cost-grid-row .form-control { text-align: left; }
-  .jf-grand-total-grid { grid-template-columns: 1fr 1fr; }
+
+  .cost-grid-header .cost-grid-col-label {
+    display: none;
+  }
+
+  /* hide col headers; aria-labels carry context */
+  .cost-grid-row .form-control {
+    text-align: left;
+  }
+
+  .jf-grand-total-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 480px) {
-  html { font-size: 15px; }
-  .jf-summary dl { grid-template-columns: 1fr; }
-  .jf-summary dd { text-align: left; }
+  html {
+    font-size: 15px;
+  }
+
+  .jf-summary dl {
+    grid-template-columns: 1fr;
+  }
+
+  .jf-summary dd {
+    text-align: left;
+  }
 }

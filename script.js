@@ -766,8 +766,30 @@ function setDateMin() {
    BOOT
    ═══════════════════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════════════════
+BUDGET MODE SWITCH — Toggle between Projected and Actual entry modes
+Appears between Finance Overview (section 2) and Fixed Costs (section 3)
+═══════════════════════════════════════════════════════════ */
+function initBudgetModeSwitch() {
+    const budgetEntry = document.getElementById('budget-entry');
+    const modeSwitch = document.getElementById('budget-mode-switch');
+
+    if (!budgetEntry || !modeSwitch) return;
+
+    // Set initial mode (unchecked = projected, checked = actual)
+    const setMode = () => {
+        const isActual = modeSwitch.checked;
+        budgetEntry.classList.remove('mode-projected', 'mode-actual');
+        budgetEntry.classList.add(isActual ? 'mode-actual' : 'mode-projected');
+    };
+
+    setMode();
+    modeSwitch.addEventListener('change', setMode);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initAuth();
+    initBudgetModeSwitch();
     initProjectForm();
     initFinanceForm();
     initFixedCostForm();
