@@ -1,0 +1,57 @@
+/* ============================================================
+   J FIRE — typography.css
+   ============================================================ */
+
+/* Google Fonts import — DM Sans (body) + DM Mono (data) */
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--text);
+  margin-bottom: var(--sp-4);
+}
+
+h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.35rem, 3vw, 2rem);    letter-spacing: -0.01em; }
+h3 { font-size: clamp(1.1rem,  2vw, 1.4rem);  }
+h4 { font-size: 1.1rem; }
+h5 { font-size: 1rem;   }
+h6 { font-size: 0.9rem; }
+
+p {
+  line-height: 1.7;
+  margin-bottom: var(--sp-4);
+  color: var(--text-muted);
+  max-width: 65ch;
+}
+
+a {
+  color: var(--sky);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+a:hover  { color: var(--coral); text-decoration: underline; }
+a:focus-visible {
+  outline: 2px solid var(--sky);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Monospace for numbers / data readouts */
+.mono {
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 0.95em;
+}
+
+small { font-size: 0.8rem; color: var(--text-muted); }
+
+strong { font-weight: 600; }
+
+/* Form labels */
+label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}

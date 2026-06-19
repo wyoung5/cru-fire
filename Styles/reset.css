@@ -1,0 +1,99 @@
+/* ============================================================
+   J FIRE — reset.css
+   Base reset and CSS custom properties (design tokens)
+   ============================================================ */
+
+/* --- Universal box model --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Design tokens --- */
+:root {
+  /* Brand palette */
+  --coral:        #F07D4A;
+  --sky:          #36B0EB;
+  --sage:         #DCEADE;
+  --lavender:     #DAD8EA;
+  --blush:        #E9DCE0;
+
+  /* Semantic surface colours */
+  --surface:      #f9f9f9;
+  --surface-alt:  #ffffff;
+  --bg:           #f3f3f3;
+
+  /* Text */
+  --text:         #0D0D0D;
+  --text-muted:   #666666;
+
+  /* Borders */
+  --border:       #d0d0d0;
+  --border-focus: var(--sky);
+
+  /* Spacing scale */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.10);
+
+  /* Transitions */
+  --transition: 180ms ease;
+}
+
+/* --- Document defaults --- */
+html {
+  font-size: 16px;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* --- Lists --- */
+ul, ol { list-style: none; }
+
+/* --- Media --- */
+img, video, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Form element normalisation --- */
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button { cursor: pointer; }
+
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}

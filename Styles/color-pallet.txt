@@ -1,0 +1,11 @@
+# Color Pallet for J Fire *
+
+#000000
+#F07D4A
+#e9dce0
+#ebb8ad
+#DCEADE
+#dad8ea
+#36B0EB
+
+// Updated March 26, 2026

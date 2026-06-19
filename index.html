@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--
+  J Fire — Clinical Trial Budgeting Tool
+  Author: wjhyoung
+  Licence: MIT
+-->
+
+<head>
+    <!-- ── Metadata ─────────────────────────────────── -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="J Fire — a free, minimalist financial dashboard for clinical research budgeting." />
+    <meta name="author" content="wjhyoung" />
+    <meta name="theme-color" content="#36B0EB" />
+
+    <title>J Fire · Clinical Trial Budget Tool</title>
+
+    <!-- ── Open Graph ────────────────────────────────── -->
+    <meta property="og:title" content="J Fire · Clinical Trial Budget Tool" />
+    <meta property="og:description" content="A free, minimalist financial dashboard for clinical research." />
+    <meta property="og:type" content="website" />
+
+    <!-- ── Favicon ───────────────────────────────────── -->
+    <link rel="icon" href="favicon.png" />
+
+    <!-- ── Bootstrap 5 ───────────────────────────────── -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+
+    <!-- ── Project Styles ────────────────────────────── -->
+    <link rel="stylesheet" href="Styles/reset.css" />
+    <link rel="stylesheet" href="Styles/typography.css" />
+    <link rel="stylesheet" href="Styles/components.css" />
+
+    <!-- ── Chart.js ──────────────────────────────────── -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+    <!-- ── Skip link ─────────────────────────────────── -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- ── Auth overlay ──────────────────────────────── -->
+    <!--
+    Blocks the page until the user signs up or signs in.
+    Controlled by JS.  Uses role="dialog" for screen readers.
+  -->
+    <div id="auth-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="auth-overlay-title">
+        <div class="auth-card">
+            <h1 id="auth-overlay-title" class="h5 mb-4" style="letter-spacing:-.02em;">J Fire</h1>
+
+            <!-- Tab switcher -->
+            <div class="d-flex gap-3 mb-4" role="tablist">
+                <button class="tab-btn active" id="tab-signin-btn" role="tab" aria-selected="true"
+                    aria-controls="tab-signin">Sign in</button>
+                <button class="tab-btn" id="tab-signup-btn" role="tab" aria-selected="false"
+                    aria-controls="tab-signup">Create account</button>
+            </div>
+
+            <!-- Sign-in panel -->
+            <div id="tab-signin" class="auth-panel active" role="tabpanel" aria-labelledby="tab-signin-btn">
+                <form id="signin-form" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label" for="signin-username">Username</label>
+                        <input class="form-control" type="text" id="signin-username" name="username"
+                            autocomplete="username" required aria-required="true" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="signin-password">Password</label>
+                        <input class="form-control" type="password" id="signin-password" name="password"
+                            autocomplete="current-password" required aria-required="true" />
+                    </div>
+                    <button type="submit" class="btn-jf-primary w-100">Sign in</button>
+                </form>
+            </div>
+
+            <!-- Sign-up panel -->
+            <div id="tab-signup" class="auth-panel" role="tabpanel" aria-labelledby="tab-signup-btn">
+                <form id="signup-form" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label" for="signup-username">Username</label>
+                        <input class="form-control" type="text" id="signup-username" name="username"
+                            autocomplete="username" required aria-required="true" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="signup-email">Email</label>
+                        <input class="form-control" type="email" id="signup-email" name="email" autocomplete="email"
+                            required aria-required="true" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="signup-password">Password</label>
+                        <input class="form-control" type="password" id="signup-password" name="password"
+                            autocomplete="new-password" required aria-required="true" minlength="6" />
+                        <div class="form-text">Minimum 6 characters.</div>
+                    </div>
+                    <button type="submit" class="btn-jf-primary w-100">Create account</button>
+                </form>
+            </div>
+
+            <!-- Shared status message for both panels -->
+            <p id="auth-message" role="alert" aria-live="assertive"></p>
+        </div>
+    </div>
+
+    <!-- ── Header / Navbar ───────────────────────────── -->
+    <header role="banner">
+        <nav class="navbar navbar-expand-md navbar-jf" aria-label="Main navigation">
+            <div class="container-fluid jf-wrapper">
+
+                <!-- Brand -->
+                <a class="navbar-brand navbar-brand-jf" href="index.html" aria-label="J Fire home">
+                    <img src="/Images/design-button-light.svg" alt="J Fire Logo" width="30" height="30">
+                    <strong style="font-size:1.1rem; letter-spacing:-.03em; color:var(--coral);">J Fire</strong>
+                </a>
+
+                <!-- Mobile toggle -->
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#primary-nav" aria-controls="primary-nav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Nav links -->
+                <div class="collapse navbar-collapse" id="primary-nav">
+                    <ul class="navbar-nav ms-auto gap-1">
+                        <!--
+              Budget link: only shown when user is authenticated (class "nav-auth-only").
+              JS adds/removes "hidden" class on login/logout.
+            -->
+                        <li class="nav-item nav-auth-only hidden"><a class="nav-link" href="#budget-entry">Budget</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                        <li class="nav-item nav-auth-only hidden">
+                            <button id="signout-btn" class="btn-jf-secondary ms-2"
+                                style="font-size:.8rem; padding:.35rem 1rem;">Sign out</button>
+                        </li>
+                        <!-- Sign-in CTA shown when logged out -->
+                        <li class="nav-item nav-guest-only">
+                            <button id="nav-signin-cta" class="btn-jf-primary ms-2"
+                                style="font-size:.8rem; padding:.35rem 1rem;">Sign in</button>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <!-- ── Main ──────────────────────────────────────── -->
+    <main id="main-content" role="main">
+        <div class="jf-wrapper py-4">
+
+            <!-- Hero -->
+            <section id="main-landing" aria-labelledby="hero-heading">
+                <h1 id="hero-heading">Clinical Trial Budget Tool</h1>
+                <p class="hero-lede nav-guest-only">
+                    J Fire is a free, open-source financial dashboard for clinical research.
+                    Build a trial budget from scratch, track costs, and visualise a 5-year projection — all in the
+                    browser.
+                </p>
+
+                <div class="hero-images nav-guest-only" aria-hidden="true">
+                    <img src="Images/trippy-computer.gif" alt="" />
+                    <img src="Images/fake-tattoo.jpg" alt="" />
+                    <img src="Images/happy-spreadsheet.jpg" alt="" />
+                </div>
+
+                <!-- CTA: shown to guests (prompts sign-in), hidden to auth users -->
+                <button id="hero-signin-cta" class="btn-jf-primary nav-guest-only">Get started — sign in</button>
+                <!-- CTA: shown to auth users only -->
+                <a href="#budget-entry" class="btn-jf-primary nav-auth-only hidden nav-guest-only">Start budgeting</a>
+            </section>
+
+            <!-- ════════════════════════════════════
+           BUDGET ENTRY
+           Hidden until authenticated (class "app-section").
+           JS removes "hidden" class on login.
+           ════════════════════════════════════ -->
+            <section id="budget-entry" class="app-section hidden" aria-labelledby="budget-heading">
+                <h2 id="budget-heading" class="visually-hidden">Build a trial budget</h2>
+
+                <!-- ── 1. Project Setup ─────────────────────── -->
+                <div class="jf-section">
+                    <p class="jf-section-title">01 · Project Setup</p>
+
+                    <!-- Saved-project badge (shown after save) -->
+                    <div id="project-badge" aria-live="polite">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                            <circle cx="6" cy="6" r="5.5" fill="#2a5c2e" />
+                            <path d="M3.5 6l1.8 1.8 3.2-3.2" stroke="#fff" stroke-width="1.2" stroke-linecap="round" />
+                        </svg>
+                        <span id="project-badge-name">Project saved</span>
+                    </div>
+
+                    <form id="project-form" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="budget-name">Project name <span
+                                        aria-hidden="true">*</span></label>
+                                <input class="form-control" type="text" id="budget-name" name="budget-name" required
+                                    aria-required="true" autocomplete="off" placeholder="Type a name to auto-save…" />
+                                <!-- Auto-save indicator shown inline next to the field -->
+                                <div id="autosave-indicator" class="autosave-indicator" aria-live="polite"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="sponsor-name">Project sponsor <span
+                                        aria-hidden="true">*</span></label>
+                                <input class="form-control" type="text" id="sponsor-name" name="sponsor-name" required
+                                    aria-required="true" autocomplete="off" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="protocol-name">Protocol number <span
+                                        aria-hidden="true">*</span></label>
+                                <input class="form-control" type="text" id="protocol-name" name="protocol-name" required
+                                    aria-required="true" autocomplete="off" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="initial-date">Date of initial contact <span
+                                        aria-hidden="true">*</span></label>
+                                <input class="form-control" type="date" id="initial-date" name="initial-date" required
+                                    aria-required="true" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" for="study-name">Full study title <span
+                                        aria-hidden="true">*</span></label>
+                                <input class="form-control" type="text" id="study-name" name="study-name" required
+                                    aria-required="true" autocomplete="off" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="disease-name">Disease <span
+                                        aria-hidden="true">*</span></label>
+                                <input class="form-control" type="text" id="disease-name" name="disease-name" required
+                                    aria-required="true" autocomplete="off" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="category-name">Disease category <span
+                                        aria-hidden="true">*</span></label>
+                                <input class="form-control" type="text" id="category-name" name="category-name" required
+                                    aria-required="true" autocomplete="off" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-4 flex-wrap">
+                            <button type="submit" class="btn-jf-primary">Save project</button>
+                            <button type="button" id="load-project-btn" class="btn-jf-secondary">Load saved
+                                project</button>
+                        </div>
+
+                        <div id="project-status" class="jf-status" role="status" aria-live="polite"></div>
+                    </form>
+                </div>
+
+                <!-- ── Budget forms (locked until project saved) ── -->
+                <div id="budget-forms-wrapper" class="budget-forms-wrapper locked">
+
+                    <!-- ── 2. Finance Overview ──────────────────── -->
+                    <div class="jf-section">
+                        <p class="jf-section-title">02 · Finance Overview</p>
+                        <form id="finance-form" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="enrollment-start">Enrollment start date</label>
+                                    <input class="form-control" type="date" id="enrollment-start"
+                                        name="enrollment-start" required aria-required="true" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="close-out-date">Close-out date</label>
+                                    <input class="form-control" type="date" id="close-out-date" name="close-out-date"
+                                        required aria-required="true" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="patients-low">Patients enrolled (low)</label>
+                                    <input class="form-control" type="number" id="patients-low" name="patients-low"
+                                        min="0" required aria-required="true" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="patients-high">Patients enrolled (high)</label>
+                                    <input class="form-control" type="number" id="patients-high" name="patients-high"
+                                        min="0" required aria-required="true" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="screen-fail-rate">Screen fail rate (%)</label>
+                                    <input class="form-control" type="number" id="screen-fail-rate"
+                                        name="screen-fail-rate" min="0" max="100" step="0.01" required
+                                        aria-required="true" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="overhead-rate">Overhead rate (%)</label>
+                                    <input class="form-control" type="number" id="overhead-rate" name="overhead-rate"
+                                        min="0" step="0.01" required aria-required="true" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="inflation-rate">Inflation rate (% per year)</label>
+                                    <input class="form-control" type="number" id="inflation-rate" name="inflation-rate"
+                                        step="0.01" required aria-required="true" />
+                                </div>
+                            </div>
+
+                            <div id="finance-summary" class="jf-summary mt-4" role="region" aria-live="polite"
+                                aria-label="Finance summary">
+                                <!-- Populated by JS -->
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ── 3. Fixed Costs ───────────────────────── -->
+                    <!--
+            Each line item now has four columns:
+              · Projected Cost     — the estimated cost
+              · Projected Budget   — the allocated budget amount
+              · Actual Cost        — what was actually spent
+              · Actual Budget      — the actual budget used
+            The column headers are rendered above the first row via a sticky header row.
+                -->
+                    <div class="jf-section">
+                        <p class="jf-section-title">03 · Fixed Costs</p>
+                        <form id="fixed-cost-form" novalidate>
+
+                            <!-- Updated column header row -->
+                            <div class="cost-grid-header">
+                                <span class="cost-grid-item-label">Line item</span>
+                                <span class="cost-grid-col-label">Projected Cost ($)</span>
+                                <span class="cost-grid-col-label">Projected Budget ($)</span>
+                                <span class="cost-grid-col-label">Actual Cost ($)</span>
+                                <span class="cost-grid-col-label">Actual Budget ($)</span>
+                            </div>
+
+                            <!-- Line items -->
+                            <div class="cost-grid-rows">
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label"
+                                        for="initial-feasibility-review-projected-cost">Initial
+                                        feasibility review</label>
+                                    <input class="form-control fixed-projected-cost-input" type="number"
+                                        id="initial-feasibility-review-projected-cost"
+                                        name="initial-feasibility-review-projected-cost" min="0" step="0.01" value="0"
+                                        aria-label="Initial feasibility review — projected cost" />
+                                    <input class="form-control fixed-projected-budget-input" type="number"
+                                        id="initial-feasibility-review-projected-budget"
+                                        name="initial-feasibility-review-projected-budget" min="0" step="0.01" value="0"
+                                        aria-label="Initial feasibility review — projected budget" />
+                                    <input class="form-control fixed-cost-input" type="number"
+                                        id="initial-feasibility-review-cost" name="initial-feasibility-review-cost"
+                                        min="0" step="0.01" value="0"
+                                        aria-label="Initial feasibility review — actual cost" />
+                                    <input class="form-control fixed-budget-input" type="number"
+                                        id="initial-feasibility-review-budget" name="initial-feasibility-review-budget"
+                                        min="0" step="0.01" value="0"
+                                        aria-label="Initial feasibility review — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="lab-setup-projected-cost">Lab
+                                        set-up</label>
+                                    <input class="form-control fixed-projected-cost-input" type="number"
+                                        id="lab-setup-projected-cost" name="lab-setup-projected-cost" min="0"
+                                        step="0.01" value="0" aria-label="Lab set-up — projected cost" />
+                                    <input class="form-control fixed-projected-budget-input" type="number"
+                                        id="lab-setup-projected-budget" name="lab-setup-projected-budget" min="0"
+                                        step="0.01" value="0" aria-label="Lab set-up — projected budget" />
+                                    <input class="form-control fixed-cost-input" type="number" id="lab-setup-cost"
+                                        name="lab-setup-cost" min="0" step="0.01" value="0"
+                                        aria-label="Lab set-up — actual cost" />
+                                    <input class="form-control fixed-budget-input" type="number" id="lab-setup-budget"
+                                        name="lab-setup-budget" min="0" step="0.01" value="0"
+                                        aria-label="Lab set-up — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="mri-setup-projected-cost">MRI
+                                        set-up</label>
+                                    <input class="form-control fixed-projected-cost-input" type="number"
+                                        id="mri-setup-projected-cost" name="mri-setup-projected-cost" min="0"
+                                        step="0.01" value="0" aria-label="MRI set-up — projected cost" />
+                                    <input class="form-control fixed-projected-budget-input" type="number"
+                                        id="mri-setup-projected-budget" name="mri-setup-projected-budget" min="0"
+                                        step="0.01" value="0" aria-label="MRI set-up — projected budget" />
+                                    <input class="form-control fixed-cost-input" type="number" id="mri-setup-cost"
+                                        name="mri-setup-cost" min="0" step="0.01" value="0"
+                                        aria-label="MRI set-up — actual cost" />
+                                    <input class="form-control fixed-budget-input" type="number" id="mri-setup-budget"
+                                        name="mri-setup-budget" min="0" step="0.01" value="0"
+                                        aria-label="MRI set-up — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="basic-startup-cost-projected-cost">Basic
+                                        start-up
+                                        cost</label>
+                                    <input class="form-control fixed-projected-cost-input" type="number"
+                                        id="basic-startup-cost-projected-cost" name="basic-startup-cost-projected-cost"
+                                        min="0" step="0.01" value="0"
+                                        aria-label="Basic start-up cost — projected cost" />
+                                    <input class="form-control fixed-projected-budget-input" type="number"
+                                        id="basic-startup-cost-projected-budget"
+                                        name="basic-startup-cost-projected-budget" min="0" step="0.01" value="0"
+                                        aria-label="Basic start-up cost — projected budget" />
+                                    <input class="form-control fixed-cost-input" type="number"
+                                        id="basic-startup-cost-cost" name="basic-startup-cost-cost" min="0" step="0.01"
+                                        value="0" aria-label="Basic start-up cost — actual cost" />
+                                    <input class="form-control fixed-budget-input" type="number"
+                                        id="basic-startup-cost-budget" name="basic-startup-cost-budget" min="0"
+                                        step="0.01" value="0" aria-label="Basic start-up cost — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="yearly-ethics-review-projected-cost">Yearly
+                                        ethics
+                                        review</label>
+                                    <input class="form-control fixed-projected-cost-input" type="number"
+                                        id="yearly-ethics-review-projected-cost"
+                                        name="yearly-ethics-review-projected-cost" min="0" step="0.01" value="0"
+                                        aria-label="Yearly ethics review — projected cost" />
+                                    <input class="form-control fixed-projected-budget-input" type="number"
+                                        id="yearly-ethics-review-projected-budget"
+                                        name="yearly-ethics-review-projected-budget" min="0" step="0.01" value="0"
+                                        aria-label="Yearly ethics review — projected budget" />
+                                    <input class="form-control fixed-cost-input" type="number"
+                                        id="yearly-ethics-review-cost" name="yearly-ethics-review-cost" min="0"
+                                        step="0.01" value="0" aria-label="Yearly ethics review — actual cost" />
+                                    <input class="form-control fixed-budget-input" type="number"
+                                        id="yearly-ethics-review-budget" name="yearly-ethics-review-budget" min="0"
+                                        step="0.01" value="0" aria-label="Yearly ethics review — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label"
+                                        for="pharmacy-maintenance-projected-cost">Pharmacy
+                                        maintenance</label>
+                                    <input class="form-control fixed-projected-cost-input" type="number"
+                                        id="pharmacy-maintenance-projected-cost"
+                                        name="pharmacy-maintenance-projected-cost" min="0" step="0.01" value="0"
+                                        aria-label="Pharmacy maintenance — projected cost" />
+                                    <input class="form-control fixed-projected-budget-input" type="number"
+                                        id="pharmacy-maintenance-projected-budget"
+                                        name="pharmacy-maintenance-projected-budget" min="0" step="0.01" value="0"
+                                        aria-label="Pharmacy maintenance — projected budget" />
+                                    <input class="form-control fixed-cost-input" type="number"
+                                        id="pharmacy-maintenance-cost" name="pharmacy-maintenance-cost" min="0"
+                                        step="0.01" value="0" aria-label="Pharmacy maintenance — actual cost" />
+                                    <input class="form-control fixed-budget-input" type="number"
+                                        id="pharmacy-maintenance-budget" name="pharmacy-maintenance-budget" min="0"
+                                        step="0.01" value="0" aria-label="Pharmacy maintenance — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="annual-fee-projected-cost">Annual
+                                        fee</label>
+                                    <input class="form-control fixed-projected-cost-input" type="number"
+                                        id="annual-fee-projected-cost" name="annual-fee-projected-cost" min="0"
+                                        step="0.01" value="0" aria-label="Annual fee — projected cost" />
+                                    <input class="form-control fixed-projected-budget-input" type="number"
+                                        id="annual-fee-projected-budget" name="annual-fee-projected-budget" min="0"
+                                        step="0.01" value="0" aria-label="Annual fee — projected budget" />
+                                    <input class="form-control fixed-cost-input" type="number" id="annual-fee-cost"
+                                        name="annual-fee-cost" min="0" step="0.01" value="0"
+                                        aria-label="Annual fee — actual cost" />
+                                    <input class="form-control fixed-budget-input" type="number" id="annual-fee-budget"
+                                        name="annual-fee-budget" min="0" step="0.01" value="0"
+                                        aria-label="Annual fee — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="labor-projected-cost">Labor</label>
+                                    <input class="form-control fixed-projected-cost-input" type="number"
+                                        id="labor-projected-cost" name="labor-projected-cost" min="0" step="0.01"
+                                        value="0" aria-label="Labor — projected cost" />
+                                    <input class="form-control fixed-projected-budget-input" type="number"
+                                        id="labor-projected-budget" name="labor-projected-budget" min="0" step="0.01"
+                                        value="0" aria-label="Labor — projected budget" />
+                                    <input class="form-control fixed-cost-input" type="number" id="labor-cost"
+                                        name="labor-cost" min="0" step="0.01" value="0"
+                                        aria-label="Labor — actual cost" />
+                                    <input class="form-control fixed-budget-input" type="number" id="labor-budget"
+                                        name="labor-budget" min="0" step="0.01" value="0"
+                                        aria-label="Labor — actual budget" />
+                                </div>
+
+                            </div><!-- /.cost-grid-rows -->
+
+                            <div class="jf-summary mt-4">
+                                <div class="jf-grand-total-grid">
+                                    <span>Total fixed costs</span>
+                                    <span id="fixed-projected-cost-total" class="mono" aria-live="polite">$0.00</span>
+                                    <span id="fixed-projected-budget-total" class="mono" aria-live="polite">$0.00</span>
+                                    <span id="fixed-cost-total" class="mono" aria-live="polite">$0.00</span>
+                                    <span id="fixed-budget-total" class="mono" aria-live="polite">$0.00</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ── 4. Variable Costs ────────────────────── -->
+                    <div class="jf-section">
+                        <p class="jf-section-title">04 · Variable Costs (per patient)</p>
+                        <form id="variable-cost-form" novalidate>
+
+                            <!-- Updated column header row -->
+                            <div class="cost-grid-header">
+                                <span class="cost-grid-item-label">Line item</span>
+                                <span class="cost-grid-col-label">Projected Cost ($)</span>
+                                <span class="cost-grid-col-label">Projected Budget ($)</span>
+                                <span class="cost-grid-col-label">Actual Cost ($)</span>
+                                <span class="cost-grid-col-label">Actual Budget ($)</span>
+                            </div>
+
+                            <!-- Line items -->
+                            <div class="cost-grid-rows">
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label"
+                                        for="professional-fees-projected-cost">Professional
+                                        fees</label>
+                                    <input class="form-control variable-projected-cost-input" type="number"
+                                        id="professional-fees-projected-cost" name="professional-fees-projected-cost"
+                                        min="0" step="0.01" value="0" aria-label="Professional fees — projected cost" />
+                                    <input class="form-control variable-projected-budget-input" type="number"
+                                        id="professional-fees-projected-budget"
+                                        name="professional-fees-projected-budget" min="0" step="0.01" value="0"
+                                        aria-label="Professional fees — projected budget" />
+                                    <input class="form-control variable-cost-input" type="number"
+                                        id="professional-fees-cost" name="professional-fees-cost" min="0" step="0.01"
+                                        value="0" aria-label="Professional fees — actual cost" />
+                                    <input class="form-control variable-budget-input" type="number"
+                                        id="professional-fees-budget" name="professional-fees-budget" min="0"
+                                        step="0.01" value="0" aria-label="Professional fees — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="mri-projected-cost">MRI</label>
+                                    <input class="form-control variable-projected-cost-input" type="number"
+                                        id="mri-projected-cost" name="mri-projected-cost" min="0" step="0.01" value="0"
+                                        aria-label="MRI — projected cost" />
+                                    <input class="form-control variable-projected-budget-input" type="number"
+                                        id="mri-projected-budget" name="mri-projected-budget" min="0" step="0.01"
+                                        value="0" aria-label="MRI — projected budget" />
+                                    <input class="form-control variable-cost-input" type="number" id="mri-cost"
+                                        name="mri-cost" min="0" step="0.01" value="0" aria-label="MRI — actual cost" />
+                                    <input class="form-control variable-budget-input" type="number" id="mri-budget"
+                                        name="mri-budget" min="0" step="0.01" value="0"
+                                        aria-label="MRI — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="nursing-projected-cost">Nursing</label>
+                                    <input class="form-control variable-projected-cost-input" type="number"
+                                        id="nursing-projected-cost" name="nursing-projected-cost" min="0" step="0.01"
+                                        value="0" aria-label="Nursing — projected cost" />
+                                    <input class="form-control variable-projected-budget-input" type="number"
+                                        id="nursing-projected-budget" name="nursing-projected-budget" min="0"
+                                        step="0.01" value="0" aria-label="Nursing — projected budget" />
+                                    <input class="form-control variable-cost-input" type="number" id="nursing-cost"
+                                        name="nursing-cost" min="0" step="0.01" value="0"
+                                        aria-label="Nursing — actual cost" />
+                                    <input class="form-control variable-budget-input" type="number" id="nursing-budget"
+                                        name="nursing-budget" min="0" step="0.01" value="0"
+                                        aria-label="Nursing — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label"
+                                        for="administration-projected-cost">Administration</label>
+                                    <input class="form-control variable-projected-cost-input" type="number"
+                                        id="administration-projected-cost" name="administration-projected-cost" min="0"
+                                        step="0.01" value="0" aria-label="Administration — projected cost" />
+                                    <input class="form-control variable-projected-budget-input" type="number"
+                                        id="administration-projected-budget" name="administration-projected-budget"
+                                        min="0" step="0.01" value="0" aria-label="Administration — projected budget" />
+                                    <input class="form-control variable-cost-input" type="number"
+                                        id="administration-cost" name="administration-cost" min="0" step="0.01"
+                                        value="0" aria-label="Administration — actual cost" />
+                                    <input class="form-control variable-budget-input" type="number"
+                                        id="administration-budget" name="administration-budget" min="0" step="0.01"
+                                        value="0" aria-label="" Administration — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="pi-fees-projected-cost">PI fees</label>
+                                    <input class="form-control variable-projected-cost-input" type="number"
+                                        id="pi-fees-projected-cost" name="pi-fees-projected-cost" min="0" step="0.01"
+                                        value="0" aria-label="PI fees — projected cost" />
+                                    <input class="form-control variable-projected-budget-input" type="number"
+                                        id="pi-fees-projected-budget" name="pi-fees-projected-budget" min="0"
+                                        step="0.01" value="0" aria-label="PI fees — projected budget" />
+                                    <input class="form-control variable-cost-input" type="number" id="pi-fees-cost"
+                                        name="pi-fees-cost" min="0" step="0.01" value="0"
+                                        aria-label="PI fees — actual cost" />
+                                    <input class="form-control variable-budget-input" type="number" id="pi-fees-budget"
+                                        name="pi-fees-budget" min="0" step="0.01" value="0"
+                                        aria-label="PI fees — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label"
+                                        for="coordinator-fees-projected-cost">Coordinator
+                                        fees</label>
+                                    <input class="form-control variable-projected-cost-input" type="number"
+                                        id="coordinator-fees-projected-cost" name="coordinator-fees-projected-cost"
+                                        min="0" step="0.01" value="0" aria-label="Coordinator fees — projected cost" />
+                                    <input class="form-control variable-projected-budget-input" type="number"
+                                        id="coordinator-fees-projected-budget" name="coordinator-fees-projected-budget"
+                                        min="0" step="0.01" value="0"
+                                        aria-label="Coordinator fees — projected budget" />
+                                    <input class="form-control variable-cost-input" type="number"
+                                        id="coordinator-fees-cost" name="coordinator-fees-cost" min="0" step="0.01"
+                                        value="0" aria-label="Coordinator fees — actual cost" />
+                                    <input class="form-control variable-budget-input" type="number"
+                                        id="coordinator-fees-budget" name="coordinator-fees-budget" min="0" step="0.01"
+                                        value="0" aria-label="Coordinator fees — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="supplies-projected-cost">Supplies</label>
+                                    <input class="form-control variable-projected-cost-input" type="number"
+                                        id="supplies-projected-cost" name="supplies-projected-cost" min="0" step="0.01"
+                                        value="0" aria-label="Supplies — projected cost" />
+                                    <input class="form-control variable-projected-budget-input" type="number"
+                                        id="supplies-projected-budget" name="supplies-projected-budget" min="0"
+                                        step="0.01" value="0" aria-label="Supplies — projected budget" />
+                                    <input class="form-control variable-cost-input" type="number" id="supplies-cost"
+                                        name="supplies-cost" min="0" step="0.01" value="0"
+                                        aria-label="Supplies — actual cost" />
+                                    <input class="form-control variable-budget-input" type="number" id="supplies-budget"
+                                        name="supplies-budget" min="0" step="0.01" value="0"
+                                        aria-label="Supplies — actual budget" />
+                                </div>
+
+                                <div class="cost-grid-row">
+                                    <label class="cost-grid-item-label" for="lab-time-projected-cost">Lab time</label>
+                                    <input class="form-control variable-projected-cost-input" type="number"
+                                        id="lab-time-projected-cost" name="lab-time-projected-cost" min="0" step="0.01"
+                                        value="0" aria-label="Lab time — projected cost" />
+                                    <input class="form-control variable-projected-budget-input" type="number"
+                                        id="lab-time-projected-budget" name="lab-time-projected-budget" min="0"
+                                        step="0.01" value="0" aria-label="Lab time — projected budget" />
+                                    <input class="form-control variable-cost-input" type="number" id="lab-time-cost"
+                                        name="lab-time-cost" min="0" step="0.01" value="0"
+                                        aria-label="Lab time — actual cost" />
+                                    <input class="form-control variable-budget-input" type="number" id="lab-time-budget"
+                                        name="lab-time-budget" min="0" step="0.01" value="0"
+                                        aria-label="Lab time — actual budget" />
+                                </div>
+
+                            </div><!-- /.cost-grid-rows -->
+
+                            <div class="jf-summary mt-4">
+                                <div class="jf-grand-total-grid">
+                                    <span>Total variable costs (per patient)</span>
+                                    <span id="variable-projected-cost-total" class="mono"
+                                        aria-live="polite">$0.00</span>
+                                    <span id="variable-projected-budget-total" class="mono"
+                                        aria-live="polite">$0.00</span>
+                                    <span id="variable-cost-total" class="mono" aria-live="polite">$0.00</span>
+                                    <span id="variable-budget-total" class="mono" aria-live="polite">$0.00</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ── 5. Budget Overview ───────────────────── -->
+                    <div class="jf-section">
+                        <p class="jf-section-title">05 · Budget Overview</p>
+
+                        <div class="jf-summary">
+                            <dl id="budget-overview-dl">
+                                <dt>Fixed costs</dt>
+                                <dd id="ov-fixed">$0.00</dd>
+                                <dt>Variable costs (mid-range patients)</dt>
+                                <dd id="ov-variable">$0.00</dd>
+                                <dt>Overhead</dt>
+                                <dd id="ov-overhead">$0.00</dd>
+                                <dt>Total (budget)</dt>
+                                <dd id="ov-total">$0.00</dd>
+                                <dt>Total (actuals)</dt>
+                                <dd id="ov-actuals-total">$0.00</dd>
+                            </dl>
+                        </div>
+
+                        <!-- Dynamic date projection chart — budget vs actuals -->
+                        <div id="budget-chart-container">
+                            <h3>Dynamic Date Budget Projection</h3>
+                            <canvas id="budgetChart" role="img"
+                                aria-label="5-year budget projection chart comparing budget and actuals"></canvas>
+                        </div>
+
+                        <!-- Budget vs Actuals comparison chart -->
+                        <div id="actuals-chart-container">
+                            <h3>Budget vs. Actuals — Current Year</h3>
+                            <canvas id="actualsChart" role="img"
+                                aria-label="Budget vs actuals comparison chart"></canvas>
+                        </div>
+                    </div>
+
+                </div><!-- /#budget-forms-wrapper -->
+            </section>
+
+            <!-- About — always visible (feature 1) -->
+            <section id="about" class="jf-section" aria-labelledby="about-heading">
+                <p class="jf-section-title">About</p>
+                <h2 id="about-heading" class="h5">What is J Fire?</h2>
+                <p>
+                    J Fire is a lightweight, browser-based budgeting tool designed for clinical research coordinators
+                    and finance teams. It runs entirely in the browser — no server, no database, no subscription.
+                </p>
+                <p>
+                    Data entered is stored only in your browser's <code>localStorage</code> and is never transmitted
+                    anywhere.
+                    Sign up or sign in above to access the full budgeting features.
+                </p>
+            </section>
+
+        </div><!-- /.jf-wrapper -->
+    </main>
+
+    <!-- ── Footer ────────────────────────────────────── -->
+    <footer role="contentinfo">
+        <div class="jf-wrapper">
+            <p>&copy; 2026 Joel Young · J Fire</p>
+            <p>Released under the <a href="/LICENSE">MIT License</a>.
+                Media licensed under <a href="/LICENSE-CC.txt">CC BY-NC-SA 4.0</a>.</p>
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <a href="#privacy">Privacy</a>
+                <a href="#terms">Terms</a>
+                <a href="#about">About</a>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- ── Scripts ────────────────────────────────────── -->
+    <!-- Bootstrap JS bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmg5ZoB4Ot3TGxAMrXMFhNMy7T"
+        crossorigin="anonymous"></script>
+
+    <script src="script.js" defer></script>
+
+    <noscript>
+        <p style="padding:2rem; text-align:center;">
+            J Fire requires JavaScript. Please enable it in your browser settings.
+        </p>
+    </noscript>
+</body>
+
+</html>

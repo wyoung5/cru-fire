@@ -1,0 +1,23 @@
+# CRU Fire #
+
+This is a clone of the repository for J Fire, a Clinical Research Financial Dashboard for small enterprises.
+
+Project initiated Montreal / Tiohtia'ke June 2026
+
+## Log ##
+
+Done:
+
+- Initialize repository March 2026
+- add graphics to header (2026-06-09)
+
+TODO:  
+
+- insert functionality for adding a custom budget line item
+- review and test each function in script.js
+- visual design overhaul
+- AP/AR functionality
+- dashboard (3x KPIs)
+- make hamburger nav in header
+- make dark-light theme toggle
+`
