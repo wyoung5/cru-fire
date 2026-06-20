@@ -595,18 +595,50 @@ function updateBudgetOverview() {
     updateProjectionChart(grandTotal, inflation);
     updateActualsChart(grandTotal, actualsGrand);
 }
-
 /* ═══════════════════════════════════════════════════════════
 DYNAMIC BUDGET PROJECTION CHART (Chart.js)
 Auto-updates on every input change via updateBudgetOverview.
 ═══════════════════════════════════════════════════════════ */
 let budgetChartInstance = null;
-/** Build year-by-year totals with compound inflation. */
-function buildProjectionData(baseTotal, inflation) {
-    const years = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'];
-    const rate = 1 + (parseFloat(inflation) || 0) / 100;
-    const totals = years.map((_, i) => +(baseTotal * Math.pow(rate, i)).toFixed(2));
-    return { years, totals };
+
+/** Calculate project duration in years from start and end dates */
+function getProjectDurationYears() {
+    const startDateStr = document.getElementById('enrollment-start')?.value;
+    const endDateStr = document.getElementById('close-out-date')?.value;
+
+    if (!startDateStr || !endDateStr) return 1; // Default to 1 year if dates not set
+
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
+    // Calculate difference in years
+    let years = endDate.getFullYear() - startDate.getFullYear();
+    const monthDiff = endDate.getMonth() - startDate.getMonth();
+
+    // Adjust for partial years
+    if (monthDiff < 0 || (monthDiff === 0 && endDate.getDate() < startDate.getDate())) {
+        years--;
+    }
+
+    // Ensure at least 1 year
+    return Math.max(1, years);
+}
+
+/** Calculate yearly budget based on project duration and prorated costs */
+function calculateYearlyBudget(baseTotal, durationYears, inflationRate) {
+    const yearlyBudgets = [];
+    let runningTotal = 0;
+
+    for (let year = 1; year <= durationYears; year++) {
+        // Calculate inflation for this year
+        const inflationFactor = Math.pow(1 + (inflationRate / 100), year - 1);
+        const yearlyAmount = baseTotal * inflationFactor;
+
+        runningTotal += yearlyAmount;
+        yearlyBudgets.push(+runningTotal.toFixed(2));
+    }
+
+    return yearlyBudgets;
 }
 function initProjectionChart() {
     const canvas = document.getElementById('budgetChart');
@@ -615,15 +647,16 @@ function initProjectionChart() {
     budgetChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+            labels: [],
             datasets: [
                 {
-                    label: 'Projected budget ($)',
-                    data: [0, 0, 0, 0, 0],
+                    label: 'Cumulative budget ($)',
+                    data: [],
                     backgroundColor: 'rgba(54, 176, 235, 0.18)',
                     borderColor: '#36B0EB',
                     borderWidth: 2,
                     borderRadius: 4,
+                    borderSkipped: false,
                 },
             ],
         },
@@ -637,10 +670,17 @@ function initProjectionChart() {
                         label: (ctx) => ' ' + formatUSD(ctx.raw),
                     },
                 },
+                title: {
+                    display: true,
+                    text: 'Project Budget by Year',
+                    font: { size: 14, weight: 'bold' },
+                    padding: { top: 10, bottom: 20 }
+                }
             },
             scales: {
                 y: {
                     beginAtZero: true,
+                    stacked: false,
                     ticks: {
                         callback: (val) => formatUSD(val),
                         font: { family: "'DM Mono', monospace", size: 11 },
@@ -649,6 +689,7 @@ function initProjectionChart() {
                     grid: { color: '#e8e8e8' },
                 },
                 x: {
+                    stacked: false,
                     ticks: { font: { size: 12 }, color: '#444' },
                     grid: { display: false },
                 },
@@ -656,11 +697,16 @@ function initProjectionChart() {
         },
     });
 }
-/** Update projection chart whenever inputs change. */
-function updateProjectionChart(baseTotal, inflation) {
+/** Update projection chart with yearly breakdown */
+function updateProjectionChart(baseTotal, inflationRate) {
     if (!budgetChartInstance) return;
-    const { totals } = buildProjectionData(baseTotal, inflation);
-    budgetChartInstance.data.datasets[0].data = totals;
+
+    const durationYears = getProjectDurationYears();
+    const yearlyBudgets = calculateYearlyBudget(baseTotal, durationYears, inflationRate);
+
+    // Update chart data
+    budgetChartInstance.data.labels = Array.from({length: durationYears}, (_, i) => `Year ${i + 1}`);
+    budgetChartInstance.data.datasets[0].data = yearlyBudgets;
     budgetChartInstance.update();
 }
 
